@@ -8,23 +8,26 @@
 #define SUMHASH512_M_BITS 1024
 
 #define SUMHASH512_BLOCK_SIZE 64    // m_bits/8 - n_rows*8 
-#define SUMHASH512_DIGEST_LENGTH 64 // n_rows*8
+#define SUMHASH512_DIGEST_SIZE 64 // n_rows*8
 
-typedef struct sumhash_state {
-    const uint8_t *salt; // salt block. NULL means unsalted mode
+typedef struct sumhash512_state {
+    uint8_t salt[SUMHASH512_BLOCK_SIZE]; // salt block. NULL means unsalted mode
 
     uint64_t state[SUMHASH512_N_ROWS];
     uint64_t count[2];
     uint8_t  buf[SUMHASH512_BLOCK_SIZE];
-} sumhash_state;
+    uint32_t has_salt;
+} sumhash512_state;
 
-int sumhash512_init(sumhash_state *state);
-int sumhash512_init_salted(sumhash_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
+int sumhash_lib_init();
 
-int sumhash512_update(sumhash_state *state, const uint8_t *in, unsigned long long inlen);
-int sumhash512_final(sumhash_state *state, uint8_t *out);
+void sumhash512_init(sumhash512_state *state);
+void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
 
-void sumhash512(uint8_t *out, const uint8_t *in, int inlen);
-void sumhash512_salted(uint8_t *out, const uint8_t *in, int inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
+void sumhash512_update(sumhash512_state *state, const uint8_t *in, unsigned long long inlen);
+void sumhash512_final(sumhash512_state *state, uint8_t *out);
+
+void sumhash512(uint8_t *out, const uint8_t *in, unsigned int inlen);
+void sumhash512_salted(uint8_t *out, const uint8_t *in, unsigned int inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
 
 #endif
