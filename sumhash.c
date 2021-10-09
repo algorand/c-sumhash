@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 
 #include "fips202.h"
 #include "sumhash.h"
@@ -59,20 +58,14 @@ static void hash_bytes(const matrix A, const uint8_t *msg, Q_t *result) {
     hash_bits(A, bits, result);
 }
 
-static pthread_once_t algorand_matrix_is_initialized = PTHREAD_ONCE_INIT;
 matrix algorandMatrix;
 
-
+__attribute__((constructor))
 static void init_algorand_matrix() {
     randomize_matrix_from_seed(algorandMatrix, (uint8_t*)"Algorand", 8);
 }
 
-int sumhash_lib_init() {
-    return pthread_once(&algorand_matrix_is_initialized, init_algorand_matrix);
-}
-
 void sumhash512_init(sumhash512_state *state) {
-    sumhash_lib_init();
     memset(state, 0, sizeof(sumhash512_state));
 }
 

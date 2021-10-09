@@ -19,7 +19,6 @@ typedef struct sumhash512_state {
     uint32_t has_salt;
 } sumhash512_state;
 
-int sumhash_lib_init();
 
 void sumhash512_init(sumhash512_state *state);
 void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
