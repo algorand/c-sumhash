@@ -36,6 +36,24 @@ int main() {
 }
 ```
 
+Simple API usage:
+
+```C
+#include <stdio.h>
+#include <string.h>
+
+#include "include/sumhash.h"
+
+int main() {
+    char* input = "Algorand";
+    uint8_t output [SUMHASH512_DIGEST_SIZE];
+    sumhash512(output, (uint8_t*)input, strlen(input));
+
+    return 0;
+}
+```
+
+
 The ```include/sumhash.h``` header contains more information about the functions usage
 
 # Spec

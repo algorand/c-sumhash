@@ -16,7 +16,7 @@ typedef struct sumhash512_state {
     uint64_t state[SUMHASH512_N_ROWS];
     uint64_t count[2];
     uint8_t  buf[SUMHASH512_BLOCK_SIZE];
-    uint32_t has_salt;
+    uint32_t use_salt;
 } sumhash512_state;
 
 

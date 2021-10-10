@@ -71,9 +71,9 @@ void sumhash512_init(sumhash512_state *state) {
 
 void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]) {
     sumhash512_init(state);
-    // Must come after sumhash512_init, which set has_salt to 0.
+    // Must come after sumhash512_init, which set use_salt to 0.
     memcpy(state->salt, salt, SUMHASH512_BLOCK_SIZE);
-    state->has_salt = 1;
+    state->use_salt = 1;
 
     uint8_t zeros[SUMHASH512_BLOCK_SIZE];
     memset(zeros, 0, SUMHASH512_BLOCK_SIZE);
@@ -82,7 +82,7 @@ void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH5
 
 static void sumhash_compress(sumhash512_state *state, const uint8_t *block, uint8_t *msg_buf) {
     le64enc_vect(msg_buf, state->state, SUMHASH512_N_ROWS*8);
-    if (!state->has_salt) {
+    if (!state->use_salt) {
         memcpy(msg_buf+SUMHASH512_N_ROWS*8, block, SUMHASH512_BLOCK_SIZE);
     } else {
         uint8_t *x = msg_buf+SUMHASH512_N_ROWS*8;
