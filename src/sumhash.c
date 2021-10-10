@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "fips202.h"
-#include "sumhash.h"
 #include "util.h"
+#include "include/sumhash.h"
 
 #define Q_t uint64_t
 typedef Q_t matrix[SUMHASH512_N_ROWS][SUMHASH512_M_BITS];

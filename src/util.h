@@ -1,3 +1,5 @@
+#ifndef __SUMHASH_UTILS_H__
+#define __SUMHASH_UTILS_H__
 #include <stdint.h>
 
 static inline void
@@ -46,3 +48,5 @@ le64enc_vect(unsigned char *dst, const uint64_t *src, size_t len)
         store64_le(dst + i * 8, src[i]);
     }
 }
+
+#endif

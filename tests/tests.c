@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sumhash.h"
-#include "fips202.h"
+#include "include/sumhash.h"
+#include "src/fips202.h"
 
 void encode_hex(char *dst, uint8_t *data, int len) {
     char *ptr = dst;
