@@ -1,4 +1,5 @@
 *.out
 *.o
 *.a
+*.d
 build/
