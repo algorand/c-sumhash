@@ -37,8 +37,17 @@ $(OBJS_DIR)/%.c.o: %.c
 	$(MKDIR_P) $(dir $@)
 	$(CC)  $(CFLAGS) -c $< -o $@
 
-.PHONY: clean
+.PHONY: benchmark
+benchmark: $(TEST_DIRS)/benchmark.out $(BUILD_DIR)/libsumhash.a
+	$(TEST_DIRS)/benchmark.out
 
+$(TEST_DIRS)/benchmark.out: $(BUILD_DIR)/libsumhash.a 
+	$(MKDIR_P) $(TEST_DIRS)
+	$(CC) $(CFLAGS) $(TEST_DIRS)/benchmark.c $< -o $@
+
+
+
+.PHONY: clean
 clean:
 	$(RM) -r $(BUILD_DIR) $(OBJS_DIR) $(TEST_DIRS)/*.out $(TEST_DIRS)/*.d
 
