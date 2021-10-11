@@ -58,4 +58,4 @@ The ```include/sumhash.h``` header contains more information about the functions
 # Spec
 
 The specification of the function as well as the security parameters
-can be found [here](https://github.com/algorand/snark-friendly-crypto/tree/master/spec)  
+can be found [here](https://github.com/algorand/go-sumhash/tree/master/spec)  
