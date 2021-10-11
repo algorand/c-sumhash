@@ -1,5 +1,3 @@
-
-
 BUILD_DIR := ./build
 OBJS_DIR := ./obj
 SRC_DIRS := ./src
@@ -18,8 +16,6 @@ CFLAGS := $(INC_FLAGS) -Wall -Werror -O2 -MMD -MP
 ARFLAGS := rcs
 
 MKDIR_P := mkdir -p
-
-
 
 
 PHONY: all
