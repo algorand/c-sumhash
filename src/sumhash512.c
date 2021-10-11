@@ -1,11 +1,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 
 #include "fips202.h"
-#include "sumhash.h"
 #include "util.h"
+#include "include/sumhash512.h"
 
 #define Q_t uint64_t
 typedef Q_t matrix[SUMHASH512_N_ROWS][SUMHASH512_M_BITS];
@@ -35,7 +34,7 @@ static void randomize_matrix_from_seed(matrix A, const uint8_t *seed, int seedle
     randomize_matrix(A, &state, read_shake);
 }
 
-static void hash_bits(const matrix A, uint8_t *msg, Q_t *result) {
+static void hash_bits(const matrix A, const uint8_t *msg, Q_t *result) {
     Q_t x;
     for (int i = 0; i < SUMHASH512_N_ROWS; i++) {
         x = 0;
@@ -48,7 +47,7 @@ static void hash_bits(const matrix A, uint8_t *msg, Q_t *result) {
     }
 }
 
-static void hash_bytes(const matrix A, uint8_t *msg, Q_t *result) {
+static void hash_bytes(const matrix A, const uint8_t *msg, Q_t *result) {
     uint8_t bits[SUMHASH512_M_BITS];
     for (int i = 0; i < SUMHASH512_M_BITS/8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -59,38 +58,31 @@ static void hash_bytes(const matrix A, uint8_t *msg, Q_t *result) {
     hash_bits(A, bits, result);
 }
 
-static pthread_once_t algorand_matrix_is_initialized = PTHREAD_ONCE_INIT;
 matrix algorandMatrix;
 
+__attribute__((constructor))
 static void init_algorand_matrix() {
     randomize_matrix_from_seed(algorandMatrix, (uint8_t*)"Algorand", 8);
 }
 
-int sumhash512_init(sumhash_state *state) {
-    pthread_once(&algorand_matrix_is_initialized, init_algorand_matrix);
-
-    state->salt = NULL;
-    state->count[0] = state->count[1] = (uint64_t) 0U;
-    for (int i = 0; i < SUMHASH512_N_ROWS; i++) {
-        state->state[i] = 0;
-    }
-    return 0;
+void sumhash512_init(sumhash512_state *state) {
+    memset(state, 0, sizeof(sumhash512_state));
 }
 
-int sumhash512_init_salted(sumhash_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]) {
+void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]) {
     sumhash512_init(state);
-    // Must come after sumhash512_init, which resets the salt to NULL.
-    state->salt = salt;
+    // Must come after sumhash512_init, which set use_salt to 0.
+    memcpy(state->salt, salt, SUMHASH512_BLOCK_SIZE);
+    state->use_salt = 1;
 
     uint8_t zeros[SUMHASH512_BLOCK_SIZE];
     memset(zeros, 0, SUMHASH512_BLOCK_SIZE);
     sumhash512_update(state, zeros, SUMHASH512_BLOCK_SIZE);
-    return 0;
 }
 
-static void sumhash_compress(sumhash_state *state, const uint8_t *block, uint8_t *msg_buf) {
+static void sumhash_compress(sumhash512_state *state, const uint8_t *block, uint8_t *msg_buf) {
     le64enc_vect(msg_buf, state->state, SUMHASH512_N_ROWS*8);
-    if (state->salt == NULL) {
+    if (!state->use_salt) {
         memcpy(msg_buf+SUMHASH512_N_ROWS*8, block, SUMHASH512_BLOCK_SIZE);
     } else {
         uint8_t *x = msg_buf+SUMHASH512_N_ROWS*8;
@@ -102,7 +94,7 @@ static void sumhash_compress(sumhash_state *state, const uint8_t *block, uint8_t
 }
 
 // This code is based on hash_sha512_cp.c from libsodium.
-int sumhash512_update(sumhash_state *state, const uint8_t *in, unsigned long long inlen) {
+void sumhash512_update(sumhash512_state *state, const uint8_t *in, unsigned long long inlen) {
     uint64_t           bitlen[2];
     unsigned long long i;
     unsigned long long r;
@@ -111,7 +103,7 @@ int sumhash512_update(sumhash_state *state, const uint8_t *in, unsigned long lon
     unsigned int b = SUMHASH512_BLOCK_SIZE;
 
     if (inlen <= 0U) {
-        return 0;
+        return;
     }
     r = (unsigned long long) ((state->count[1] >> 3) % b);
 
@@ -127,7 +119,7 @@ int sumhash512_update(sumhash_state *state, const uint8_t *in, unsigned long lon
         for (i = 0; i < inlen; i++) {
             state->buf[r + i] = in[i];
         }
-        return 0;
+        return;
     }
 
     for (i = 0; i < b - r; i++) {
@@ -143,14 +135,10 @@ int sumhash512_update(sumhash_state *state, const uint8_t *in, unsigned long lon
         inlen -= b;
     }
     inlen %= b;
-    for (i = 0; i < inlen; i++) {
-        state->buf[i] = in[i];
-    }
-
-    return 0;
+    memcpy(state->buf, in, inlen);
 }
 
-int sumhash512_final(sumhash_state *state, uint8_t *out) {
+void sumhash512_final(sumhash512_state *state, uint8_t *out) {
     unsigned int r;
     unsigned int i;
 
@@ -179,18 +167,17 @@ int sumhash512_final(sumhash_state *state, uint8_t *out) {
 
     le64enc_vect(out, state->state, SUMHASH512_N_ROWS*8);
 
-    return 0;
 }
 
-void sumhash512(uint8_t *out, const uint8_t *in, int inlen) {
-    sumhash_state st;
+void sumhash512(uint8_t *out, const uint8_t *in, unsigned int inlen) {
+    sumhash512_state st;
     sumhash512_init(&st);
     sumhash512_update(&st, in, inlen);
     sumhash512_final(&st, out);
 }
 
-void sumhash512_salted(uint8_t *out, const uint8_t *in, int inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]) {
-    sumhash_state st;
+void sumhash512_salted(uint8_t *out, const uint8_t *in, unsigned int inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]) {
+    sumhash512_state st;
     sumhash512_init_salted(&st, salt);
     sumhash512_update(&st, in, inlen);
     sumhash512_final(&st, out);
