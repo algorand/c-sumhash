@@ -11,7 +11,7 @@
 #define SUMHASH512_DIGEST_SIZE 64 // n_rows*8
 
 typedef struct sumhash512_state {
-    uint8_t salt[SUMHASH512_BLOCK_SIZE]; // salt block. NULL means unsalted mode
+    uint8_t salt[SUMHASH512_BLOCK_SIZE];
 
     uint64_t state[SUMHASH512_N_ROWS];
     uint64_t count[2];
@@ -29,11 +29,11 @@ typedef struct sumhash512_state {
 void sumhash512_init(sumhash512_state *state);
 
 /******************************************************************
- *  sumhash512_init_salted - initializes the sumhash512_state struct
- *  using a salt array.
+ *  sumhash512_init_salted - initializes the sumhash512_state for 
+ * hash computation in salted mode
  * 
  * IN : state - the struct to be initialized
- * IN : salt - salted data which will be used by the sumhash512 function.
+ * IN : salt - the salt value 
  ******************************************************************/
 void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
 
@@ -51,7 +51,7 @@ void sumhash512_update(sumhash512_state *state, const uint8_t *in, unsigned long
  * 
  * IN : state - sumhash512_state struct (already initialized)
  * OUT : out - array in which the digest result will be returned.
- *              the size MUST have size of SUMHASH512_DIGEST_SIZE
+ *              the array MUST have size of SUMHASH512_DIGEST_SIZE
  ******************************************************************/
 void sumhash512_final(sumhash512_state *state, uint8_t *out);
 
@@ -59,20 +59,20 @@ void sumhash512_final(sumhash512_state *state, uint8_t *out);
  *  sumhash512 - calculate sumhash on a given input.
  * 
  * OUT : out - array in which the digest result will be returned.
- *              the size MUST have size of SUMHASH512_DIGEST_SIZE
+ *              this array MUST have size of SUMHASH512_DIGEST_SIZE
  * IN : in - array of bytes on which hash will be evaluated.
  * IN : inlen - the size in bytes of the in array.
  ******************************************************************/
 void sumhash512(uint8_t *out, const uint8_t *in, unsigned int inlen);
 
 /******************************************************************
- *  sumhash512 - calculate sumhash on a given input and a salt input
+ *  sumhash512_salted - computes the sumhash on a given input in salted mode
  * 
  * OUT : out - array in which the digest result will be returned.
- *              the size MUST have size of SUMHASH512_DIGEST_SIZE
+ *              the array MUST have size of SUMHASH512_DIGEST_SIZE
  * IN : in - array of bytes on which hash will be evaluated.
  * IN : inlen - the size in bytes of the in array.
- * IN : salt - salted data used by the sumhash512 function.
+ * IN : salt - the salt value 
  ******************************************************************/
 void sumhash512_salted(uint8_t *out, const uint8_t *in, unsigned int inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
 
