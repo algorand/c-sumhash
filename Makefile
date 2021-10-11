@@ -7,7 +7,7 @@ TEST_DIRS := ./tests
 
 CC := gcc
 AR := ar
-SRCS_FILES := sumhash.c fips202.c
+SRCS_FILES := sumhash512.c fips202.c
 SRCS := $(SRCS_FILES:%=$(SRC_DIRS)/%)
 OBJS := $(SRCS:%=$(OBJS_DIR)/%.o)
 DEP := $(OBJS:%.o=%.d)
@@ -44,7 +44,7 @@ $(OBJS_DIR)/%.c.o: %.c
 .PHONY: clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) $(OBJS_DIR) $(TEST_DIRS)/*.out
+	$(RM) -r $(BUILD_DIR) $(OBJS_DIR) $(TEST_DIRS)/*.out $(TEST_DIRS)/*.d
 
 
 

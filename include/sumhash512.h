@@ -1,5 +1,5 @@
-#ifndef __SUMHASH_H__
-#define __SUMHASH_H__
+#ifndef __SUMHASH512_H__
+#define __SUMHASH512_H__
 
 #include <stddef.h>
 #include <stdint.h>

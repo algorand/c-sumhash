@@ -4,7 +4,7 @@
 
 #include "fips202.h"
 #include "util.h"
-#include "include/sumhash.h"
+#include "include/sumhash512.h"
 
 #define Q_t uint64_t
 typedef Q_t matrix[SUMHASH512_N_ROWS][SUMHASH512_M_BITS];

@@ -1,4 +1,4 @@
-Sumhash
+C-Sumhash
 ====================
 
 Algorand's subset-sum hash function implementation in C.
@@ -6,12 +6,12 @@ Algorand's subset-sum hash function implementation in C.
 # Build And Tests
 
 ```bash
-git clone https://github.com/algorand/sumhash-c
+git clone https://github.com/algorand/c-sumhash
 make
 ```
 
-The ```make``` command will build the library and run the function on the test vector.
-The output can be found on the build dir:
+The ```make``` command builds the library and runs the tests.
+The output can be found in the build directory:
 ```bash
 ./build/libsumhash.a
 ```
@@ -22,7 +22,7 @@ The output can be found on the build dir:
 #include <stdio.h>
 #include <string.h>
 
-#include "include/sumhash.h"
+#include "include/sumhash512.h"
 
 int main() {
     char* input = "Algorand";
@@ -37,12 +37,11 @@ int main() {
 ```
 
 Simple API usage:
-
 ```C
 #include <stdio.h>
 #include <string.h>
 
-#include "include/sumhash.h"
+#include "include/sumhash512.h"
 
 int main() {
     char* input = "Algorand";

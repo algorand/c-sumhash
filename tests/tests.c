@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "include/sumhash.h"
+#include "include/sumhash512.h"
 #include "src/fips202.h"
 
 void encode_hex(char *dst, uint8_t *data, int len) {
