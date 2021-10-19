@@ -53,7 +53,7 @@ int main() {
 ```
 
 
-The ```include/sumhash.h``` header contains more information about the functions usage
+The ```include/sumhash512.h``` header contains more information about the functions usage
 
 # Spec
 

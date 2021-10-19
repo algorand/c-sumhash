@@ -2,37 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "fips202.h"
+
 #include "util.h"
 #include "include/sumhash512.h"
+#include "matrix.h"
+#include "algorand_matrix.h"
 
 #define Q_t uint64_t
 typedef Q_t matrix[SUMHASH512_N_ROWS][SUMHASH512_M_BITS];
 
-static void randomize_matrix(matrix A, void *ctx, void (*read_rand)(void *ctx, uint8_t *out, size_t outlen)) {
-    uint8_t w[8];
-    for (int i = 0; i < SUMHASH512_N_ROWS; i++) {
-        for (int j = 0; j < SUMHASH512_M_BITS; j++) {
-            read_rand(ctx, w, 8);
-            A[i][j] = load64_le(w);
-        }
-    }
-}
-
-static void read_shake(void *ctx, uint8_t *out, size_t outlen) {
-    keccak_state *state = ctx;
-    shake256_squeeze(out, outlen, state);
-} 
-
-static void randomize_matrix_from_seed(matrix A, const uint8_t *seed, int seedlen) {
-    keccak_state state;
-    shake256_init(&state);
-    uint8_t p[6] = {64, 0, (uint8_t)SUMHASH512_N_ROWS, SUMHASH512_N_ROWS>>8, (uint8_t)SUMHASH512_M_BITS, SUMHASH512_M_BITS>>8};
-    shake256_absorb(&state, p, 6);
-    shake256_absorb(&state, seed, seedlen);
-    shake256_finalize(&state);
-    randomize_matrix(A, &state, read_shake);
-}
 
 static void hash_bytes(const matrix A, const uint8_t *msg, Q_t *result) { 
     uint64_t t[SUMHASH512_N_ROWS];
@@ -53,12 +31,7 @@ static void hash_bytes(const matrix A, const uint8_t *msg, Q_t *result) {
     }
 }
 
-static matrix algorandMatrix;
 
-__attribute__((constructor))
-static void init_algorand_matrix() {
-    randomize_matrix_from_seed(algorandMatrix, (uint8_t*)"Algorand", 8);
-}
 
 void sumhash512_init(sumhash512_state *state) {
     memset(state, 0, sizeof(sumhash512_state));

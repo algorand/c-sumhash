@@ -4,8 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SUMHASH512_N_ROWS 8
-#define SUMHASH512_M_BITS 1024
+#define SUMHASH512_STATE_SIZE 8
 
 #define SUMHASH512_BLOCK_SIZE 64    // m_bits/8 - n_rows*8 
 #define SUMHASH512_DIGEST_SIZE 64 // n_rows*8
@@ -13,7 +12,7 @@
 typedef struct sumhash512_state {
     uint8_t salt[SUMHASH512_BLOCK_SIZE];
 
-    uint64_t state[SUMHASH512_N_ROWS];
+    uint64_t state[SUMHASH512_STATE_SIZE];
     uint64_t count[2];
     uint8_t  buf[SUMHASH512_BLOCK_SIZE];
     uint32_t use_salt;

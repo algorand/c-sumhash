@@ -5,7 +5,7 @@
 #include <sys/resource.h>
 
 #include "include/sumhash512.h"
-#include "src/fips202.h"
+#include "fips202.h"
 
 #define TESTS_INPUT_LEN 6000
 
