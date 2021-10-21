@@ -12,7 +12,7 @@ DEP := $(OBJS:%.o=%.d)
 
 INC_FLAGS := -I. -I../include
 
-CFLAGS := $(INC_FLAGS) -Wall -Werror -O2 -MMD -MP -Wpedantic
+CFLAGS := $(INC_FLAGS) -Wall -Werror -O2 -MMD -MP -Wpedantic -mavx2
 ARFLAGS := rcs
 
 MKDIR_P := mkdir -p
