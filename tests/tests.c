@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "include/sumhash512.h"
-#include "src/fips202.h"
+#include "fips202.h"
 
 void encode_hex(char *dst, uint8_t *data, int len) {
     char *ptr = dst;
@@ -19,6 +19,7 @@ void print_hex(uint8_t *data, int len) {
     printf("\n");
 }
 
+#define TESTS_INPUT_LEN 6000
 #define TEST_ELEMENT_SIZE 256 
 
 typedef struct test_element_t {
@@ -53,8 +54,8 @@ const test_element test_vector[] = {
 		"2495462abaa3b2eaa84b32eae9d97e1031dfde9cfebe78e8de1df110a0f1a80f918e4f652b8f6c754698413ebbfac41f74ec1a25111769a7633151e49b90ecfe",
 	},
 	{
-		"I think, therefore I am. – René Descartes.",
-		"908e03f00e7224cfd875cd42e0879cc8f225d536ac2796b2eb637e19c08fb749c3830e5908074ef92cc97b6feca0de778cd9800de467f41fef60792fcc844dcc",
+		"I think, therefore I am. – Rene Descartes.",
+		"4a22a6207adb7a978a980c8bfb173d96d24d5faf3f22848f8bd4de09c24f11180d3eeafdc06a13d3f9e62458460ece5587e0b1cbca875663cf19d146788b1dd4",
 	},
 };
 
@@ -64,13 +65,13 @@ int test_sanity(){
     keccak_state shake;
     shake256_init(&shake);
     shake256_absorb_once(&shake, (uint8_t*)"sumhash input", 13);
-    const int input_len = 6000;
-    uint8_t input[input_len];
-    shake256_squeeze(input, input_len, &shake);
+
+    uint8_t input[TESTS_INPUT_LEN];
+    shake256_squeeze(input, TESTS_INPUT_LEN, &shake);
 
     sumhash512_state hash;
     sumhash512_init(&hash);
-    sumhash512_update(&hash, (uint8_t*)input, input_len);
+    sumhash512_update(&hash, (uint8_t*)input, TESTS_INPUT_LEN);
     uint8_t output [SUMHASH512_DIGEST_SIZE];
     sumhash512_final(&hash, output);
 
@@ -90,9 +91,9 @@ int test_salt(){
     keccak_state shake;
     shake256_init(&shake);
     shake256_absorb_once(&shake, (uint8_t*)"sumhash input", 13);
-    const int input_len = 6000;
-    uint8_t input[input_len];
-    shake256_squeeze(input, input_len, &shake);
+
+    uint8_t input[TESTS_INPUT_LEN];
+    shake256_squeeze(input, TESTS_INPUT_LEN, &shake);
 
     uint8_t salt[SUMHASH512_BLOCK_SIZE];
 
@@ -102,7 +103,7 @@ int test_salt(){
 
     sumhash512_state hash;
     sumhash512_init_salted(&hash, salt);    
-    sumhash512_update(&hash, input, input_len);
+    sumhash512_update(&hash, input, TESTS_INPUT_LEN);
     uint8_t output [SUMHASH512_DIGEST_SIZE];
     sumhash512_final(&hash, output);
 

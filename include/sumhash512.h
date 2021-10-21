@@ -1,11 +1,10 @@
-#ifndef __SUMHASH512_H__
-#define __SUMHASH512_H__
+#ifndef SUMHASH512_H
+#define SUMHASH512_H
 
 #include <stddef.h>
 #include <stdint.h>
 
-#define SUMHASH512_N_ROWS 8
-#define SUMHASH512_M_BITS 1024
+#define SUMHASH512_STATE_SIZE 8
 
 #define SUMHASH512_BLOCK_SIZE 64    // m_bits/8 - n_rows*8 
 #define SUMHASH512_DIGEST_SIZE 64 // n_rows*8
@@ -13,7 +12,7 @@
 typedef struct sumhash512_state {
     uint8_t salt[SUMHASH512_BLOCK_SIZE];
 
-    uint64_t state[SUMHASH512_N_ROWS];
+    uint64_t state[SUMHASH512_STATE_SIZE];
     uint64_t count[2];
     uint8_t  buf[SUMHASH512_BLOCK_SIZE];
     uint32_t use_salt;
@@ -44,7 +43,7 @@ void sumhash512_init_salted(sumhash512_state *state, const uint8_t salt[SUMHASH5
  * IN : in - array of bytes to be consumed be the hash function.
  * IN : inlen - the size in bytes of the in array.
  ******************************************************************/
-void sumhash512_update(sumhash512_state *state, const uint8_t *in, unsigned long long inlen);
+void sumhash512_update(sumhash512_state *state, const uint8_t *in, size_t inlen);
 
 /******************************************************************
  *  sumhash512_final - return the digest result of the sumhash512 function 
@@ -63,7 +62,7 @@ void sumhash512_final(sumhash512_state *state, uint8_t *out);
  * IN : in - array of bytes on which hash will be evaluated.
  * IN : inlen - the size in bytes of the in array.
  ******************************************************************/
-void sumhash512(uint8_t *out, const uint8_t *in, unsigned int inlen);
+void sumhash512(uint8_t *out, const uint8_t *in, size_t inlen);
 
 /******************************************************************
  *  sumhash512_salted - computes the sumhash on a given input in salted mode
@@ -74,6 +73,6 @@ void sumhash512(uint8_t *out, const uint8_t *in, unsigned int inlen);
  * IN : inlen - the size in bytes of the in array.
  * IN : salt - the salt value 
  ******************************************************************/
-void sumhash512_salted(uint8_t *out, const uint8_t *in, unsigned int inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
+void sumhash512_salted(uint8_t *out, const uint8_t *in, size_t inlen, const uint8_t salt[SUMHASH512_BLOCK_SIZE]);
 
 #endif
