@@ -24,6 +24,9 @@ static void randomize_matrix(matrix A, void *ctx, void (*read_rand)(void *ctx, u
     uint8_t w[8];
     for (int i = 0; i < SUMHASH512_N_ROWS; i++) {
         for (int j = 0; j < SUMHASH512_M_BITS; j++) {
+            // Each byte read from rand is interpreted as an 8-bit string in LE/LSB
+            // encoding, consistent with SHA-3 (NIST FIPS 202, Appendix B). See also:
+            // https://keccak.team/keccak_bits_and_bytes.html
             read_rand(ctx, w, 8);
             A[i][j] = load64_le(w);
         }
