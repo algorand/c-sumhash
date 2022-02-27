@@ -115,7 +115,8 @@ void sumhash512_final(sumhash512_state *state, uint8_t *out) {
 
     // Add padding.
     r = (unsigned int) ((state->count[1] >> 3) % b);
-    state->buf[r] = 0x80;
+    // The padding byte is 0x01 since sumhash reads bits in little-endian order.
+    state->buf[r] = 0x01;
     if (r < b - 16) {
         for (i = 1; i < b - 16 - r; i++) {
             state->buf[r + i] = 0;
